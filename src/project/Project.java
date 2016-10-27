@@ -1,5 +1,10 @@
 package project;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Project {
@@ -12,11 +17,11 @@ public class Project {
 	static String fileToUse = "nonsens.txt";
 	static boolean printDot = false;
 
-	public static void main(String[] args) {
-		// Parsing parameters 
+	public static void main(String[] args) throws InterruptedException {
+		// Parsing parameters
 		Arrays.asList(args).stream().forEach(s -> {
 			if (s.startsWith("file=")) {
-				fileToUse = s.substring(5);
+				fileToUse = s.substring(5, s.length()-4);
 			} else {
 				switch (s) {
 				case "-S":
@@ -29,22 +34,23 @@ public class Project {
 					algoToUse = Algo.GogolXL;
 					break;
 				case "-Dot":
-					printDot=true;
+					printDot = true;
 					break;
 				}
 			}
 		});
-		System.out.println("Using file : "+fileToUse);
-		System.out.println("Printing a Dot graph : "+printDot);
-		System.out.println("Executing algo : "+algoToUse);
+		System.out.println("Using file : " + fileToUse);
+		System.out.println("Printing a Dot graph : " + printDot);
+		System.out.println("Executing algo : " + algoToUse);
 
-		City c = new Parser(fileToUse).buildCity();
-		if (printDot)
-			c.toDot(true,true,false,true);
-		System.out.println("found degre impair : "+c.nbDegreImpair()+", "+c.nbDegreImpair2());
 		
-		Gogol algorithm =null;
-		switch(algoToUse){
+		City c = new Parser(fileToUse+".txt").buildCity();
+		if (printDot)
+			c.toDot(true, true, false, true,fileToUse);
+		System.out.println("Counting Vertices with odd number of Edges : \n\t algo1 " + c.nbDegreImpair() + "\n\t algo2 " + c.nbDegreImpair2());
+
+		Gogol algorithm = null;
+		switch (algoToUse) {
 		case GogolS:
 			algorithm = new GogolS();
 			break;
@@ -54,11 +60,42 @@ public class Project {
 		case GogolXL:
 			algorithm = new GogolXL();
 			break;
-		default: 
+		default:
 			System.err.println("error please set -S -L -XL to choose an algorithm");
 		}
-		
-		algorithm.driveThrough(c, c.startingNode());
+
+		algorithm.driveThrough(c, c.startingNode(), fileToUse);
+
+	}
+
+	/**
+	 * fail safe command execution 
+	 * @param cmd
+	 * @return
+	 */
+	public static Object run(String cmd) {
+		Process p;
+		try {
+
+			Process process = new ProcessBuilder(new String[] { "bash", "-c", cmd }).start();
+	
+			ArrayList<String> output = new ArrayList<String>();
+			BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				output.add(line);
+				System.out.println(line);
+			}
+			// There should really be a timeout here.
+			if (0 != process.waitFor())
+				return null;
+
+			return output;
+
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		return null;
 	}
 
 }

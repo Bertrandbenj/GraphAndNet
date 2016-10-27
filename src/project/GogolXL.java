@@ -7,7 +7,7 @@ public class GogolXL implements Gogol{
 	}
 	
 	@Override
-	public void driveThrough(City c, Square startingPoint) {
+	public void driveThrough(City c, Square startingPoint, String file) {
 		System.out.println(this.getClass().getName()+" driveThrough");
 		
 	}

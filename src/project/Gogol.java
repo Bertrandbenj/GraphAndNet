@@ -7,5 +7,5 @@ package project;
  */
 public interface Gogol {
 
-	void driveThrough(City c, Square startingPoint);
+	void driveThrough(City c, Square startingPoint, String fileToUse);
 }
