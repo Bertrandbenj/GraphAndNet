@@ -1,0 +1,24 @@
+9.
+13.
+PlaceSeule.
+Place Royale.
+Rond-point de Rennes.
+Rond-point de Paris.
+Place Saint-Pierre.
+Place Maréchal-Foch.
+Place du Chateau.
+Place du Commerce.
+Place du Cirque.
+Route de Rennes ;Place Royale ;Rond-point de Rennes.
+Boulevard des Belges ;Rond-point de Rennes ;Rond-point de Paris.
+Route de Paris ;Rond-point de Paris ;Place Royale.
+Rue de la Marne ;Place Royale ;Place Saint-Pierre.
+Rue Gambetta ;Place Saint-Pierre ;Place Maréchal-Foch.
+Rue Henri IV ;Place Royale ;Place Maréchal-Foch.
+Rue des Trois Croissants ;Place Royale ;Place du Commerce.
+Allée d'Orléan ;Place Royale ;Place du Cirque.
+Cours des 50 Otages ;Place du Cirque ;Place du Commerce.
+Rue de Strasbourg ;Place du Commerce ;Place Maréchal-Foch.
+Allée du port ;Place du Commerce ;Place du Chateau.
+Cours Saint-Andre ;Place du Chateau ;Place Maréchal-Foch.
+Rue toute Seule;PlaceSeule;Place Maréchal-Foch.
