@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Street {
+public class Street implements GraphObj{
 	
 	public Square getSq1() {
 		return sq1;
@@ -15,11 +15,14 @@ public class Street {
 		
 		return sq2;
 	}
-
+public void mark(String m ){
+	this.mark+=m;
+}
 
 	Square sq1, sq2;
 	String name;
 	public String mark="";
+	public Integer pos;
 
 	public Street(Square square1, Square square2, String string2) {
 		this.sq1=square1;

@@ -1,0 +1,13 @@
+5.
+6.
+Place Royale.
+Place Saint-Pierre.
+Place Maréchal-Foch.
+Place du Chateau.
+Place du Commerce.
+Rue de la Marne ;Place Royale ;Place Saint-Pierre.
+Rue Gambetta ;Place Saint-Pierre ;Place Maréchal-Foch.
+Rue Henri IV ;Place Royale ;Place Maréchal-Foch.
+Rue de Strasbourg ;Place du Commerce ;Place Maréchal-Foch.
+Allée du port ;Place du Commerce ;Place du Chateau.
+Cours Saint-Andre ;Place du Chateau ;Place Maréchal-Foch.

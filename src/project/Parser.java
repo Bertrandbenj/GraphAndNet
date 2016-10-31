@@ -48,7 +48,7 @@ public class Parser {
 				streets.add(s);
 			}
 			
-			return new City(streets,square);
+			return new City(streets,square,true);
 		} catch (IOException e) {
 			System.err.println("Parsing file : " + filePath);
 			e.printStackTrace();

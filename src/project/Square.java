@@ -1,12 +1,16 @@
 package project;
 
-public class Square {
+public class Square implements GraphObj {
 	
 	public String mark="";
 
 	String name;
 	public Square(String name) {
 		this.name=name.trim();
+	}
+
+	public void mark(String m ){
+		this.mark+=m;
 	}
 
 	@Override

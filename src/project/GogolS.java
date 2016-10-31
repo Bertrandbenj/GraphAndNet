@@ -10,31 +10,57 @@ public class GogolS implements Gogol{
 	public GogolS(){
 	}
 
+	/**
+	 * The main loop can't be parallelized easily
+	 * 
+	 * Complexity = 
+	 *   Complexity of {@link City#adjacentStreet()}
+	 * + O(2*E)
+	 * 
+	 * <pre>
+	 * adjM <- Adjacency Map<Square, List<Street>> {@link City#adjacentStreet()}
+	 * current <- startingPoint
+	 * do
+	 * 		path.add(current) 
+	 * 		adjL <- adjM.get(current)
+	 * 		street <- adjL.removeFirst
+	 * 		path.add(street)
+	 * 
+	 * 		if adjL is empty then
+	 * 			adjM.remove(adjL)
+	 * 		fi
+	 * 	
+	 * 		current <- street.OtherSquare
+	 * while adjM not empty
+	 * <pre>
+	 */
 	@Override
-	public void driveThrough(City city, Square startingPoint, String file) {
+	public void driveThrough(City city, Square current, String file) {
 		System.out.println("Driving Through the city : \n");
 		
-		city.addReverseEdges();
-		Map<Square, List<Street>> adj = city.adjacentStreet();
+		Map<Square, List<Street>> adjM = city.adjacentStreet();
 		//System.out.println("adj.size:"+adj.size() );
 		
-		LinkedList<Square> path = new LinkedList<Square>();
-		path.add(startingPoint);
-		Square current = startingPoint;
+		LinkedList<GraphObj> path = new LinkedList<GraphObj>();
+		
 		int step=0;
-		while(!adj.isEmpty()){
-			System.out.println("\t at : " + current.name );
-			Street st = adj.get(current).remove(0);
-			System.out.println("\t in : " + st.name );
-			st.mark+=" "+step++;
-			path.add(st.sq2);
-			if(adj.get(current).isEmpty()){
-				adj.remove(current);
+		do{
+			path.add(current);
+			List<Street> adjL = adjM.get(current);
+			Street street = adjL.remove(0);
+			path.add(street);
+			
+			if(adjL.isEmpty()){
+				adjM.remove(current);
 			}
-			current=st.sq2;
-		}
+			current=street.sq2;
+			
+			System.out.println("\tGoing to "+current.name +" by "+street.name);
+			 // used for printing out the graph
+			street.mark("step " + step++);
+		}while(!adjM.isEmpty());
 		//System.out.println(path.stream().map(s->s.mark+" "+s.name).collect(Collectors.joining("\n")) );
 		
-		city.toDot(false, true, true, false, "GogolS_"+file);
+		city.toDot(false,true, true, true, true, "GogolS_"+file,null);
 	}
 }

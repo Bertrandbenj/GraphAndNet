@@ -1,0 +1,20 @@
+digraph {
+	Place_Royale [label="Place Royale",color="red"];
+	Place_Saint_Pierre [label="Place Saint-Pierre"];
+	Place_Marechal_Foch [label="Place Maréchal-Foch"];
+	Place_du_Chateau [label="Place du Chateau"];
+	Place_du_Commerce [label="Place du Commerce"];
+
+	Place_Royale -> Place_Saint_Pierre [label="2\n"];
+	Place_Saint_Pierre -> Place_Marechal_Foch [label="2\n"];
+	Place_Royale -> Place_Marechal_Foch [label="1\n"];
+	Place_du_Commerce -> Place_Marechal_Foch [label="2\n"];
+	Place_du_Commerce -> Place_du_Chateau [label="1\n"];
+	Place_du_Chateau -> Place_Marechal_Foch [label="2\n"];
+	Place_Saint_Pierre -> Place_Royale [label="1\n"];
+	Place_Marechal_Foch -> Place_Saint_Pierre [label="4\n"];
+	Place_Marechal_Foch -> Place_Royale [label="3\n"];
+	Place_Marechal_Foch -> Place_du_Commerce [label="2\n"];
+	Place_du_Chateau -> Place_du_Commerce [label="1\n"];
+	Place_Marechal_Foch -> Place_du_Chateau [label="1\n"];
+}

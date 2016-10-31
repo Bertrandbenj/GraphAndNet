@@ -46,7 +46,7 @@ public class Project {
 		
 		City c = new Parser(fileToUse+".txt").buildCity();
 		if (printDot)
-			c.toDot(true, true, false, true,fileToUse);
+			c.toDot(false,true, true, false, true,fileToUse,null);
 		System.out.println("Counting Vertices with odd number of Edges : \n\t algo1 " + c.nbDegreImpair() + "\n\t algo2 " + c.nbDegreImpair2());
 
 		Gogol algorithm = null;
