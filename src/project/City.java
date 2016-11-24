@@ -3,12 +3,11 @@ package project;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import project.City.Node;
 
 import static java.util.stream.Collectors.*;
 /**
@@ -26,16 +25,19 @@ import static java.util.stream.Collectors.*;
  *
  */
 public class City {
-	
-	public class Node {
-		
-		Street s;
-		String mark;
 
-	}
-
+	/**
+	 * The streets objects as parsed from the input file
+	 */
 	private Street[] streetsL;
+	/**
+	 * The streets objects representing the opposed arcs of the graph
+	 */
 	private Street[] streetsL2;
+	
+	/**
+	 * The list of Squares as parsed from the input file
+	 */
 	private Square[] squaresL;
 	
 	public City(List<Street> sts, List<Square> sqs, boolean asDirectedGraph) {
@@ -47,13 +49,29 @@ public class City {
 			.collect(Collectors.toList())
 			.toArray(new Street[streetsL.length]);
 	}
+	
+	/**
+	 * give the incidence of each square 
+	 * @param c the city 
+	 * @return a mapping representing the incidence of each square
+	 */
+	public Map<Square,Integer> degreOfX(){
+		return Stream.of(streetsL)
+				.flatMap(street -> Stream.of( street.sq1, street.sq2 ))
+				.collect(toMap(s -> s, s -> 1, Integer::sum));
+	}
 
+	/**
+	 * aggregate marking of the two arcs into one street object. 
+	 * used for display only
+	 * 
+	 * @return a list of undirected streets
+	 */
 	public Stream<Street> singleStreet(){
 		List<Street>  other = Arrays.asList(streetsL2);
 		return Stream.of(streetsL).map(s->{
-			
 			Street t = other.stream().filter(s1->s.name==s1.name).collect(toList()).get(0);
-			s.mark="" +s.mark+ "\n"+t.mark;
+			//s.mark="" +s.mark+ "\n"+t.mark;
 			return s;
 		});
 		 
@@ -78,7 +96,7 @@ public class City {
 	 *  	the main complexity here is the one of the "aggregate by key"
 	 *  	which depend on the implementation used. 
 	 *  
-	 * Not that this operation can be parallelized
+	 * Note that this operation can be parallelized
 	 * </pre>
 	 * 
 	 * @return a key value map of Square -> List of Square
@@ -109,9 +127,13 @@ public class City {
 						(list1, list2) -> Stream.concat(list1.stream(),list2.stream()).collect(toList())
 				));
 	}
+
+	List<Street> oposingArcs(List<Street> l){
+		return getStreets()
+				.filter(st -> l.contains(new Street(st.sq2,st.sq1,st.name)))
+				.collect(Collectors.toList());
+	}
 	
-
-
 	/**
 	 * <pre>
 	 * write Doc/fileOut.dot, a representation of the graph in dot format 
@@ -122,59 +144,58 @@ public class City {
 	 * @param printMark
 	 * @param printDoubleArrow
 	 * @param fileOut
+	 * @param path 
 	 * @return
 	 */
 	String toDot(boolean allArcs, boolean printStreetName, boolean printSquareName, boolean printMark, boolean printDoubleArrow,
-			String fileOut, Square current) {
+			String fileOut, Square current, LinkedList<Street> path) {
 		
 		String res = "digraph {\n";
 		if (printDoubleArrow)
 			res += "edge [dir=\"both\"];\n";
+		
 		// -------- Nodes description
-		res += getSquares().map(sq -> {
-			String square = "\t" + sq.cleanName() + " [label=\"";
-			if (printMark)
-				square += sq.mark == "" ? "" : (sq.mark + "\\n");
-			if (printSquareName)
-				square += sq.name;
-			square += "\"";
-			if(sq.equals(current)){
-				square += ",color=\"red\"";
-			}
-			square += "];";
-			return square;
-		}).collect(joining("\n"));
-
-		// -------- Edges
+		res += getSquares()
+				.map(sq ->  sq.toDot(printMark, printSquareName, sq==current))
+				.collect(joining("\n"));
 		res += "\n\n";
-
+		
+		
+		// -------- Edges description
 		res += ((allArcs)?getStreets():singleStreet())
-				.map(st -> {
-					String edge = "\t" + st.sq1.cleanName() + " -> " + st.sq2.cleanName();
-					edge += " [label=\"";
-					if (printMark)
-						edge += st.mark;
-					if (printStreetName)
-						edge += st.name;
-					edge += st.pos+ "\"];";
-					return edge;
-				}).collect(joining("\n"));
+				.map(st -> st.toDot(printStreetName,printMark,path))
+				.collect(joining("\n"));	
 		res += "\n}";
-		System.out.println("Creating output graphviz file: Doc/" + fileOut + ".dot");
+		
 
-		// output the dot File 
-		try (PrintWriter out = new PrintWriter("Doc/" + fileOut + ".dot")) {
-
+		// Output the dot File 
+		try (PrintWriter out = new PrintWriter("doc/dot/" + fileOut + ".dot")) {
 			out.println(res);
 			out.close();
-
+			System.out.println("Created output graphviz file: doc/dot/" + fileOut + ".dot");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		// fail safe attempt to use dot and produce an image output 
-		Project.run("/usr/bin/dot -Tpng Doc/" + fileOut + ".dot -o Doc/" + fileOut + ".png");
+		Project.run("/usr/bin/dot -Tpng doc/dot/" + fileOut + ".dot -o doc/png/" + fileOut + ".png");
 		return res;
+	}
+	
+	/**
+	 * Steps of execution in ordered sequence. 
+	 *  
+	 * @return a map of execution steps 
+	 */
+	Map<Integer, String> getOrderedSteps(){
+		return getStreets()
+				.filter(s-> s.step!=null)
+				.sorted((s1,s2) -> s1.step.compareTo(s2.step))
+				.collect(toMap(
+					s -> s.step,
+					s -> s.name,
+					(x,y) -> x
+				));
 	}
 
 	/**
@@ -203,9 +224,11 @@ public class City {
 	 * @return the number of Square having an odd number of adjacent street
 	 */
 	long nbDegreImpair() {	
-		return getStreets().flatMap(street -> Stream.of( street.sq1, street.sq2 ))
-				.collect(toMap(s -> s, s -> 1, Integer::sum))
-				.entrySet().stream()
+		return getStreets()
+				.flatMap(street -> Stream.of( street.sq1, street.sq2 ))
+				.collect(toMap(s->s, s -> 1, Integer::sum))
+				.entrySet()
+				.stream()
 				.filter(ent -> (ent.getValue().longValue() % 2) == 1)
 				.count();
 	}
@@ -227,7 +250,16 @@ public class City {
 		}
 	}
 
+	/**
+	 * <pre>
+	 * Tell whether or not this graph admit an Eulerian path
+	 * using the property that says :
+	 * "For the existence of Eulerian trails it is necessary that zero or two vertices have an odd degree"
+	 * @return true if and only if the Graph represented by this City object admit an Eulerian trail 
+	 * <pre>
+	 */
 	boolean isEulerien() {
+		System.out.println("Counting Vertices with odd number of Edges : \n\t algo1 " + nbDegreImpair() + "\n\t algo2 " + nbDegreImpair2());
 		long odd = nbDegreImpair();
 		boolean res = odd == 0 || odd == 2; 
 		System.out.println("the Graph is Eulerien : "+res);
@@ -258,28 +290,45 @@ public class City {
 		return map.entrySet().stream().filter(ent -> (ent.getValue().longValue() % 2) == 1).count();
 	}
 	
-	public Stream<Street> getStreets() {
-		return  Stream.concat(Stream.of(streetsL),Stream.of(streetsL2));
+	/**
+	 * only the vertices having an odd number of edges
+	 * @return
+	 */
+	public List<Square> oddVertices() {
+		return Stream.of(streetsL)
+				.flatMap(street -> Stream.of( street.sq1, street.sq2 ))
+				.collect(toMap(s->s, s -> 1, Integer::sum))
+				.entrySet()
+				.stream()
+				.filter(ent -> (ent.getValue().longValue() % 2) == 1)
+				.map(ent -> ent.getKey())
+				.collect(toList());
+		//return Stream.of(streetsL).filter(st -> l.contains(st.sq1) || l.contains(st.sq2));
 	}
 	
 	/**
-	 * Streets are un-oriented edges as we assume we can drive them both way.
-	 * yet they have square1 and square2 members making the graph directed. in
-	 * order to truly have bi-directional Edges we may need the reverse edges.
-	 * foreach [square1,square2,streetName] we produce an additional
-	 * [square2,square1,streetName]
+	 * All Streets as directed edges 
 	 * 
-	 * Graph(V,E) -> Graph(V,2*E)
-	 * undirected -> directed graph
-	 * 
-	 * @return a collection of Street 
+	 * @return a collection of Street as a Stream 
 	 */
-	private Stream<Street> asDirectedStreet(){
-		return Stream.concat(getStreets(), getStreets().map(st -> new Street(st.sq2, st.sq1, st.name)));
+	public Stream<Street> getStreets() {
+		return  Stream.concat(Stream.of(streetsL),Stream.of(streetsL2));
 	}
-	
+
+	/**
+	 * get the Squares 
+	 * 
+	 * @return a collections of Squares as a Stream
+	 */
 	public Stream<Square> getSquares(){
 		return Stream.of(squaresL);
+	}
+
+	public void toDot(boolean allArcs, boolean printStreetName, boolean printSquareName, boolean printMark,
+			boolean printDoubleArrow, String string, Square current) {
+		toDot(allArcs, printStreetName, printSquareName, printMark, printDoubleArrow, string, current,
+				new LinkedList<Street>());
+
 	}
 
 }

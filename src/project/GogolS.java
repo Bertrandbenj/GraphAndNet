@@ -1,12 +1,9 @@
 package project;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public class GogolS implements Gogol{
+public class GogolS implements Car{
 	public GogolS(){
 	}
 
@@ -41,11 +38,10 @@ public class GogolS implements Gogol{
 		Map<Square, List<Street>> adjM = city.adjacentStreet();
 		//System.out.println("adj.size:"+adj.size() );
 		
-		LinkedList<GraphObj> path = new LinkedList<GraphObj>();
+		Path path = new Path();
 		
 		int step=0;
 		do{
-			path.add(current);
 			List<Street> adjL = adjM.get(current);
 			Street street = adjL.remove(0);
 			path.add(street);

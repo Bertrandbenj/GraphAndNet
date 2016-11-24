@@ -5,7 +5,7 @@ package project;
  * @author ben
  *
  */
-public interface Gogol {
+public interface Car {
 
 	void driveThrough(City c, Square startingPoint, String fileToUse);
 }

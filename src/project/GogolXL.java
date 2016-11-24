@@ -1,6 +1,6 @@
 package project;
 
-public class GogolXL implements Gogol{
+public class GogolXL implements Car{
 
 	public GogolXL(){
 		

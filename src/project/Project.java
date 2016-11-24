@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class Project {
 
 	public enum Algo {
-		GogolS, GogolL, GogolXL
+		GogolS, GogolL, GogolLRec, GogolXL
 	}
 
 	static Algo algoToUse = Algo.GogolS;
@@ -30,6 +30,9 @@ public class Project {
 				case "-L":
 					algoToUse = Algo.GogolL;
 					break;
+				case "-LRec":
+					algoToUse = Algo.GogolLRec;
+					break;
 				case "-XL":
 					algoToUse = Algo.GogolXL;
 					break;
@@ -47,9 +50,8 @@ public class Project {
 		City c = new Parser(fileToUse+".txt").buildCity();
 		if (printDot)
 			c.toDot(false,true, true, false, true,fileToUse,null);
-		System.out.println("Counting Vertices with odd number of Edges : \n\t algo1 " + c.nbDegreImpair() + "\n\t algo2 " + c.nbDegreImpair2());
-
-		Gogol algorithm = null;
+		
+		Car algorithm = null;
 		switch (algoToUse) {
 		case GogolS:
 			algorithm = new GogolS();
@@ -57,11 +59,14 @@ public class Project {
 		case GogolL:
 			algorithm = new GogolL();
 			break;
+		case GogolLRec:
+			algorithm = new GogolLRec();
+			break;
 		case GogolXL:
 			algorithm = new GogolXL();
 			break;
 		default:
-			System.err.println("error please set -S -L -XL to choose an algorithm");
+			System.err.println("error please set -S -L -LRec -XL to choose an algorithm");
 		}
 
 		algorithm.driveThrough(c, c.startingNode(), fileToUse);

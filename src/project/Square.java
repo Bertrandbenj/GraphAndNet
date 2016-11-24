@@ -1,10 +1,12 @@
 package project;
 
-public class Square implements GraphObj {
+public class Square {
 	
 	public String mark="";
+	public Integer step;
 
 	String name;
+	
 	public Square(String name) {
 		this.name=name.trim();
 	}
@@ -32,6 +34,20 @@ public class Square implements GraphObj {
 	public String cleanName(){
 		return name.replaceAll(" ", "_").replaceAll("-", "_").replaceAll("é", "e");
 		
+	}
+	
+	public String toDot(boolean printMark, boolean printSquareName, boolean red){
+		String square = "\t" + cleanName() + " [label=\"";
+		if (printMark && mark!=null && mark != "")
+			square += mark + "\\n";
+		if (printSquareName)
+			square += name;
+		square += "\"";
+		if(red){
+			square += ",color=\"red\"";
+		}
+		square += "];";
+		return square;
 	}
 }
 
