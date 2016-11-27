@@ -1,53 +1,197 @@
 \documentclass[a4paper, 11pt]{article}
 \usepackage{comment} % enables the use of multi-line comments (\ifx \fi) 
-\usepackage{lipsum} %This package just generates Lorem Ipsum filler text. 
 \usepackage{fullpage} % changes the margin
 
 \begin{document}
 %Header-Make sure you update this information!!!!
 \noindent
-\large\textbf{Post/Pre-Lab X Report} \hfill \textbf{FirstName LastName} \\
-\normalsize ECE 100-003 \hfill Teammates: Student1, Student2 \\
-Prof. Oruklu \hfill Lab Date: XX/XX/XX \\
-TA: Adam Sumner \hfill Due Date: XX/XX/XX
+\large\textbf{Graphs \& Networks \- GogolCar Report} \hfill \textbf{Benjamin Bertrand} \\
+\normalsize M1 ATAL, ORO \hfill Due Date: 30/11/2016 \\
+F.S.T. de Nantes \hfill Prof. Irena Rusu\\
+
 
 \section*{Problem Statement}
-Put your Problem statement here! Example of a Citation\cite[p.219]{Robotics}. Here's Another Citation\cite{Flueck}
+3 algorithmes de parcours de graphes, pour simuler le parcours d'une voiture
+dans une ville. Les rues sont des aretes non-oriente et peuvent parfois etre
+considerer comme deux arcs orientes. les rues sont delimite par des places, les
+noeuds du graphe.
 
-\section*{Investigation/Research}
-\lipsum[2]
+Pour ce projet, j'utilise les lambdas java 8, ainsi que l'API Stream qui permet
+de faire des operations ensembliste interessantes et simplifie grandement le
+code.
 
-\section*{Alternative Solutions}
-\lipsum[3]
+\section{Mapper en listes d\'adjacence}
+\begin{verbatim}
+Map<Square, List<Street>> adjacentStreet() {
+    return getStreets().collect(
+        toMap(
+            st -> st.sq1, 
+            st -> Stream.of(st).collect(toList()), 
+            (list1, list2) -> Stream.concat(list1.stream(),list2.stream()).collect(toList())
+        )); 
+}
+\end{verbatim}
+On cherche par exemple a associer chaque sommet au rues qui lui sont adjacentes.
+Pour cela, on prends la liste des rues, on extrait les sommets et les agregent
+selon les regles suivante.
 
-\section*{Optimum Solution}
-\lipsum[4]
-% to comment sections out, use the command \ifx and \fi. Use this technique when writing your pre lab. For example, to comment something out I would do:
-%  \ifx
-%	\begin{itemize}
-%		\item item1
-%		\item item2
-%	\end{itemize}	
-%  \fi
+\begin{itemize}
+  \item On prend la clef de la map comme etant l'un des sommet de la rue (toujours le
+meme sq1).
+\begin{verbatim}
+st -> st.sq1
+\end{verbatim}
 
-\section*{Construction/Implementation}
-\lipsum[5]
+\item On prend la rue elle meme comme valeur correspondant a la clef. Mais sous
+forme de liste pour permetre l'agregation.
+\begin{verbatim}
+st -> Stream.of(st).collect(toList())
+\end{verbatim}
 
-\section*{Analysis \& Testing}
-\lipsum[6]
+\item On definit la regles pour les cas ou la clef apparait plusieurs fois, ici
+une concatenation des collections.
+\begin{verbatim}
+(list1, list2) -> Stream.concat(list1.stream(),list2.stream())
+                        .collect(toList())
+\end{verbatim}
+\end{itemize}
 
-\section*{Final Evaluation}
-\lipsum[7]
 
-\section*{Attachments}
-%Make sure to change these
-Lab Notes, HelloWorld.ic, FooBar.ic
-%\fi %comment me out
+\section{Calcul du degre de chaque sommets}
+En utilisant un Stream de Street on peut reduire le set entier en une
+  valeur:
+\begin{verbatim}
+long nbDegreImpair() {	
+    return getStreets()
+                .flatMap(street -> Stream.of( street.sq1, street.sq2 ))
+                .collect(toMap(s->s, s -> 1, Integer::sum))
+                .entrySet()
+                .stream()
+                .filter(ent -> (ent.getValue().longValue() % 2) == 1)
+                .count();
+    }
+\end{verbatim}
+\begin{itemize}
+  \item Convertit une Street en un Stream de Square possedant toute les occurences de
+sommet comme extremite d'une rue.
+\begin{verbatim}
+street -> Stream.of( street.sq1, street.sq2 )
+\end{verbatim} 
+  \item Map collector, on associe 1 a chaque sommet puis on les cumul par somme lorsque
+le sommet apparait plusieurs fois.
+\begin{verbatim}
+toMap(s->s, s -> 1, Integer::sum)  // Map<Square,Integer>
+\end{verbatim}
+  \item Pour chaque clef-valeur, On filtre les sommets impairs uniquement puis on
+en compte la somme.
+\begin{verbatim}
+ .entrySet()  // Set<Entry<Square,Integer>>
+ .stream()    // Stream<Entry<Square,Integer>>
+ .filter(ent -> (ent.getValue().longValue() % 2) == 1) 
+ .count();
+\end{verbatim}
+\end{itemize}
+
+
+
+\section*{GogolS}
+Pour l'algo S on a juste a prendre la map d'adjacence et avancer tant qu'il
+reste des element dedant. en prenant soin d'enlever les noeuds qui n'ont plus
+d'arcs sortant
+\begin{verbatim}
+int step=0;
+do{
+    List<Street> adjL = adjM.get(current);
+    Street street = adjL.remove(0);
+    path.add(street);
+			
+    if(adjL.isEmpty()){
+        adjM.remove(current);
+    }
+    current=street.sq2;
+			
+    street.mark("step " + step++);
+}while(!adjM.isEmpty());
+\end{verbatim}
+
+\section*{GogolL}
+Pour le second algo: 
+
+\begin{itemize}
+\item on calcul d'abords une arborescence quelconque (sous la forme d'une
+liste de rue).
+\begin{verbatim}
+    public Path arborescence(Square current, Path pathTaken) {
+        if (pathTaken.size() == city.getSquares().count())
+            return pathTaken;
+
+        List<Street> streetsOut = city.adjacentStreet().get(current);
+
+        for (Street street : streetsOut) {
+            if (!pathTaken.contains(street.sq2)) {
+                pathTaken = arborescence(street.sq2, pathTaken.drive(street));
+            }
+        }
+        return pathTaken;
+    }
+\end{verbatim}
+
+\item on numerote les rues grace a cette arborescence.
+\begin{verbatim}
+    public void numerotation(Path arbo) {
+        List<Street> antiArbo = city.oposingArcs(arbo);
+       
+        city.adjacentStreet().forEach((sq, list) -> {
+            int degre = city.degreOfX().get(sq);
+            list.sort((s1,s2)->{
+                int res = 0;
+                if(arbo.contains(s1)) res+=2;
+                if(arbo.contains(s2)) res-=2;
+                if(antiArbo.contains(s1)) res-=1;
+                if(antiArbo.contains(s2)) res+=1;
+                return res;
+            });
+            
+            for(Street t : list){
+                t.pos=degre--;
+            }
+        });
+    }
+\end{verbatim}
+
+\item On parcours en partant de current et en prenant le plus petit sommet.pos
+attribut
+\begin{verbatim}
+    Path usedStreet = new Path();
+    for (int step=1; step<=city.getStreets().count()/2;step++) {
+        Street next = adjM.get(current)
+                            .stream()
+                            .filter(s -> !usedStreet.contains(s.name))
+                            .sorted((s1, s2) -> s1.pos.compareTo(s2.pos))
+                            .findFirst()
+                            .get();
+			
+        usedStreet.add(next);
+        next.step = step;
+        current = next.sq2;
+    }
+\end{verbatim}
+\end{itemize}
+
+
+
+\section*{GogolXL}
+
+
+\section*{Conclusion}
+
+
 
 \begin{thebibliography}{9}
-\bibitem{Robotics} Fred G. Martin \emph{Robotics Explorations: A Hands-On Introduction to Engineering}. New Jersey: Prentice Hall.
-\bibitem{Flueck}  Flueck, Alexander J. 2005. \emph{ECE 100}[online]. Chicago: Illinois Institute of Technology, Electrical and Computer Engineering Department, 2005 [cited 30
-August 2005]. Available from World Wide Web: (http://www.ece.iit.edu/~flueck/ece100).
+%\bibitem{Robotics} Fred G. Martin \emph{Robotics Explorations: A Hands-On
+% Introduction to Engineering}. New Jersey: Prentice Hall.
+%\bibitem{Flueck}  Flueck, Alexander J. 2005. \emph{ECE 100}[online]. Chicago:
+% Illinois Institute of Technology, Electrical and Computer Engineering Department, 2005 [cited 30 August 2005]. Available from World Wide Web: (http://www.ece.iit.edu/~flueck/ece100).
 \end{thebibliography}
 
 \end{document}

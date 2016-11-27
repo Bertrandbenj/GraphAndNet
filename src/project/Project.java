@@ -1,8 +1,6 @@
 package project;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,7 +77,6 @@ public class Project {
 	 * @return
 	 */
 	public static Object run(String cmd) {
-		Process p;
 		try {
 
 			Process process = new ProcessBuilder(new String[] { "bash", "-c", cmd }).start();

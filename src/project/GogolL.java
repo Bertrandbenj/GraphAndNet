@@ -1,10 +1,8 @@
 package project;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class GogolL implements Car {
 
@@ -34,26 +32,22 @@ public class GogolL implements Car {
 	@Override
 	public void driveThrough(City c, Square current, String file) {
 		this.city = c;
+		c.toDot(true,true, true, false, false,file+"L",null);
+		Map<Square, List<Street>> adjM = city.adjacentStreet();
+		
+		System.out.println("Driving Through the city : \n\tStarting : " + current);
+		
 
 		Path arbo = arborescence(current, new Path());
-		System.out.println(arbo.toDot());
+		System.out.println(arbo.toDot()+"===================\n" + arbo);
+		
 		
 		numerotation(arbo);
+		city.toDot(true, false, true, true, false, "GogolL_" + file + "_step_0" , current,arbo);
 
-		System.out.println("===================");
-		System.out.println(arbo.stream().map(x -> x.toString()).collect(Collectors.joining(",")));
-
-		System.out.println("Driving Through the city : \n\tStarting : " + current);
-		int step = 0;
-		Map<Square, List<Street>> adjM = city.adjacentStreet();
-
-
-
-		city.toDot(true, false, true, true, false, "GogolL_" + file + "_step_" + step, current,arbo);
-
+		
 		Path usedStreet = new Path();
-		while (usedStreet.size() < city.getStreets().count()/2) {
-			step++;
+		for (int step=1; step<=city.oriented().count()/2;step++) {
 
 			Street next = adjM.get(current)
 					.stream()
@@ -78,12 +72,12 @@ public class GogolL implements Car {
 		
 		city.adjacentStreet().forEach((sq, list) -> {
 			
-			int degre = city.degreOfX().get(sq);
+			int degre = city.verticesDegree().get(sq);
 			
 			list.sort((s1,s2)->{
 				int res = 0;
-				if(arbo.contains(s1)) res+=2;
-				if(arbo.contains(s2)) res-=2;
+//				if(arbo.contains(s1)) res+=2;
+//				if(arbo.contains(s2)) res-=2;
 				if(antiArbo.contains(s1)) res-=1;
 				if(antiArbo.contains(s2)) res+=1;
 				System.out.println(s1.name +" : "+s2.name+" : "+res);
@@ -95,8 +89,7 @@ public class GogolL implements Car {
 			}
 			
 			System.out.println(sq.name +"'s sorted list : "+list.stream().map(x->x.name+":"+x.pos).collect(Collectors.joining(" - "))+"\n");
-			
-			
+
 		});
 	}
 

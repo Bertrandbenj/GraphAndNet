@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,7 +47,7 @@ public class Parser {
 				streets.add(s);
 			}
 			
-			return new City(streets,square,true);
+			return new City(streets,square);
 		} catch (IOException e) {
 			System.err.println("Parsing file : " + filePath);
 			e.printStackTrace();

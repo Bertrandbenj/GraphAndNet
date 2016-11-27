@@ -21,8 +21,16 @@ public class Street {
 	final String name;
 
 	private String mark;
+	Integer weight;
 	public Integer pos;
 	public Integer step;
+	
+	public Street(Square square1, Square square2, Integer weight) {
+		this.sq1 = square1;
+		this.sq2 = square2;
+		this.name = square1.name +"-"+square2.name;
+		this.weight=weight;
+	}
 
 	public Street(Square square1, Square square2, String string2) {
 		this.sq1 = square1;
@@ -39,7 +47,7 @@ public class Street {
 
 		String label = "";
 		if (printStreetName)
-			label += name + "<br>";
+			label += name ;
 		if (printMark && mark != null && mark != "")
 			label += "mark:" + mark + "\\n";
 		if (pos != null)
@@ -58,12 +66,17 @@ public class Street {
 	public boolean equals(Object o) {
 		if (o == null)
 			return false;
+		
+		if (o instanceof String) {
+			Street s = (Street) o;
+			return s.name == name ;
+		}
+		
 		if (o instanceof Street) {
 			Street s = (Street) o;
 			return s.sq1 == sq1 && s.sq2 == sq2 && s.name == name;
-		} else {
-			return false;
-		}
+		} 
+		return false;
 	}
 
 }

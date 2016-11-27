@@ -15,21 +15,21 @@ public class GogolS implements Car{
 	 * + O(2*E)
 	 * 
 	 * <pre>
-	 * adjM <- Adjacency Map<Square, List<Street>> {@link City#adjacentStreet()}
-	 * current <- startingPoint
+	 * adjM = AdjacencyMap {@link City#adjacentStreet()}
+	 * current = startingPoint
 	 * do
 	 * 		path.add(current) 
-	 * 		adjL <- adjM.get(current)
-	 * 		street <- adjL.removeFirst
+	 * 		adjL = adjM.get(current)
+	 * 		street = adjL.removeFirst
 	 * 		path.add(street)
 	 * 
 	 * 		if adjL is empty then
 	 * 			adjM.remove(adjL)
 	 * 		fi
 	 * 	
-	 * 		current <- street.OtherSquare
+	 * 		current = street.OtherSquare
 	 * while adjM not empty
-	 * <pre>
+	 * </pre>
 	 */
 	@Override
 	public void driveThrough(City city, Square current, String file) {
