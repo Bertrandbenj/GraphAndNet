@@ -1,0 +1,24 @@
+digraph {
+	A [label="A"];
+	B [label="B"];
+	C [label="C"];
+	D [label="D"];
+	E [label="E"];
+	F [label="F"];
+	G [label="G"];
+
+	B -> A [label="R1"];
+	A -> C [label="R2"];
+	C -> D [label="R3"];
+	A -> D [label="R4"];
+	A -> F [label="R5"];
+	E -> D [label="R6"];
+	G -> D [label="R8"];
+	A -> B [label="R1"];
+	C -> A [label="R2"];
+	D -> C [label="R3"];
+	D -> A [label="R4"];
+	F -> A [label="R5"];
+	D -> E [label="R6"];
+	D -> G [label="R8"];
+}

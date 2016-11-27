@@ -1,0 +1,26 @@
+digraph {
+	A [label="A"];
+	B [label="B"];
+	C [label="C"];
+	D [label="D"];
+	E [label="E"];
+	F [label="F",color="red"];
+	G [label="G"];
+
+	B -> A [label="pos:1\n"];
+	A -> C [label="pos:2\n",color=red];
+	C -> D [label="pos:1\n",color=red];
+	A -> D [label="pos:3\n"];
+	A -> F [label="pos:4\n"];
+	E -> D [label="pos:1\n"];
+	G -> D [label="pos:1\n"];
+	A -> B [label="pos:1\n",color=red];
+	C -> A [label="pos:2\n"];
+	D -> C [label="pos:4\n"];
+	D -> A [label="pos:3\n"];
+	F -> A [label="pos:1\n",color=red];
+	D -> E [label="pos:2\n",color=red];
+	D -> G [label="pos:1\n",color=red];
+	B -> F [label="pos:0\n"];
+	G -> E [label="pos:0\n"];
+}
