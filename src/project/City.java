@@ -1,6 +1,7 @@
 package project;
 
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,14 @@ public class City {
 						.toArray(new Street[streetsL.length]);
 
 		singleton = this;
+	}
+	
+	public Street reverseEdge(Street t){
+		
+		Street trev = new Street(t.sq2,t.sq1,t.name);
+		//System.out.println(t +" "+trev+"\n"+ Stream.of(streetsL).filter(st -> st.name.equals(t.name)).map(x->x.toString()).collect(Collectors.joining("\n")));
+		return Stream.of(streetsL2).filter(s -> s.equals(trev)).findFirst().orElse(null);
+		 
 	}
 
 	/**
@@ -135,7 +144,8 @@ public class City {
 	 */
 	String toDot(boolean allArcs, boolean printStreetName, boolean printSquareName, boolean printMark,
 			boolean printDoubleArrow, String fileOut, Square current, LinkedList<Street> path) {
-
+		if(!Project.printDot) return "";
+		
 		String res = "digraph {\n";
 		if (printDoubleArrow && !allArcs)
 			res += "edge [dir=\"both\"];\n";
@@ -226,13 +236,23 @@ public class City {
 		}
 	}
 	
-	Street[] extra;
+
 	
-	public void setExtra(List<Street> list ){
-		System.out.println("adding virtual Streets to the city"+ list +" "+extra);
-		if(extra==null){
-			extra = list.toArray(new  Street[list.size()]);
-		}
+	public void setExtra(List<Path> list ){
+		System.out.println("\nAdding virtual streets to the city equivalent to the following path:\n"+ list +"\n");
+		
+		streetsL = Stream.concat(
+						Stream.of(streetsL),
+						list.stream()
+						.map(path -> new Street(path.tail(), path.head(), path.toString() ) ))
+					.collect(Collectors.toList()).toArray(new Street[list.size()+streetsL.length]);
+
+		streetsL2 = Stream.concat(
+				Stream.of(streetsL2),
+				list.stream()
+				.map(path -> new Street(path.head(), path.tail(), path.toString() ) ))
+			.collect(Collectors.toList()).toArray(new Street[list.size()+streetsL2.length]);
+
 		
 	}
 
@@ -244,8 +264,8 @@ public class City {
 	public Stream<Street> oriented() {
 		
 		Stream<Street> res =Stream.concat(Stream.of(streetsL), Stream.of(streetsL2));
-		if(extra!=null)
-			return Stream.concat(res, Stream.of(extra));
+//		if(extra!=null)
+//			return Stream.concat(res, Stream.of(extra));
 			
 		return res;
 	}

@@ -22,9 +22,13 @@ public class AdjacencyLists extends HashMap<Square, List<Street>>{
 	 * @return a new Adjacency Map without the given street 
 	 */
 	public AdjacencyLists driveIn(Street st){
-		AdjacencyLists res = new AdjacencyLists(this);
-		res.get(st.getSq1()).removeIf(x -> st.name == x.name);
-		res.get(st.getSq2()).removeIf(x -> st.name == x.name);
+		AdjacencyLists res = (AdjacencyLists) this.clone();
+		
+		//System.out.println("AVANT"+this.get(st.getSq1())+" "+res);
+		res.get(st.getSq1()).remove(st);
+		if(res.get(st.sq1).size()==0)
+			res.remove(st.sq1);
+		//System.out.println("APRES"+this.get(st.getSq1()));		
 		return res;
 	}
 

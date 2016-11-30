@@ -1,5 +1,10 @@
 \documentclass[a4paper, 11pt]{article}
 \usepackage{comment} % enables the use of multi-line comments (\ifx \fi) 
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{subfig}
 \usepackage{fullpage} % changes the margin
 
 \begin{document}
@@ -12,15 +17,15 @@ F.S.T. de Nantes \hfill Prof. Irena Rusu\\
 
 \section*{Problem Statement}
 3 algorithmes de parcours de graphes, pour simuler le parcours d'une voiture
-dans une ville. Les rues sont des aretes non-oriente et peuvent parfois etre
-considerer comme deux arcs orientes. les rues sont delimite par des places, les
-noeuds du graphe.
+dans une ville. Les rues sont des arêtes non-oriente et peuvent parfois être
+considérer comme deux arcs orientes. les rues sont délimité par des places, les
+nœuds du graphe.
 
-Pour ce projet, j'utilise les lambdas java 8, ainsi que l'API Stream qui permet
-de faire des operations ensembliste interessantes et simplifie grandement le
+Pour ce projet, j'utilise les lambda java 8, ainsi que l'API Stream qui permet
+de faire des opérations ensembliste intéressantes et simplifie grandement le
 code.
 
-\section{Mapper en listes d\'adjacence}
+\section{Mapper en listes d'adjacence}
 \begin{verbatim}
 Map<Square, List<Street>> adjacentStreet() {
     return getStreets().collect(
@@ -32,24 +37,23 @@ Map<Square, List<Street>> adjacentStreet() {
 }
 \end{verbatim}
 On cherche par exemple a associer chaque sommet au rues qui lui sont adjacentes.
-Pour cela, on prends la liste des rues, on extrait les sommets et les agregent
-selon les regles suivante.
+Pour cela, on prends la liste des rues, on extrait les sommets et les agrègent
+selon les règles suivante.
 
 \begin{itemize}
-  \item On prend la clef de la map comme etant l'un des sommet de la rue (toujours le
-meme sq1).
+  \item On prend la clef de la map comme étant l'un des sommet de la rue (toujours le même sq1).
 \begin{verbatim}
 st -> st.sq1
 \end{verbatim}
 
-\item On prend la rue elle meme comme valeur correspondant a la clef. Mais sous
-forme de liste pour permetre l'agregation.
+\item On prend la rue elle même comme valeur correspondant a la clef. Mais sous
+forme de liste pour permettre l’agrégation.
 \begin{verbatim}
 st -> Stream.of(st).collect(toList())
 \end{verbatim}
 
-\item On definit la regles pour les cas ou la clef apparait plusieurs fois, ici
-une concatenation des collections.
+\item On définit la règles pour les cas ou la clef apparaît plusieurs fois, ici
+une concaténation des collections.
 \begin{verbatim}
 (list1, list2) -> Stream.concat(list1.stream(),list2.stream())
                         .collect(toList())
@@ -57,8 +61,8 @@ une concatenation des collections.
 \end{itemize}
 
 
-\section{Calcul du degre de chaque sommets}
-En utilisant un Stream de Street on peut reduire le set entier en une
+\section{Calcul du degré de chaque sommets}
+En utilisant un Stream de Street on peut réduire le set entier en une
   valeur:
 \begin{verbatim}
 long nbDegreImpair() {	
@@ -72,13 +76,13 @@ long nbDegreImpair() {
     }
 \end{verbatim}
 \begin{itemize}
-  \item Convertit une Street en un Stream de Square possedant toute les occurences de
-sommet comme extremite d'une rue.
+  \item convertit une Street en un Stream de Square possédant toute les occurrences de
+sommet comme extrémité d'une rue.
 \begin{verbatim}
 street -> Stream.of( street.sq1, street.sq2 )
 \end{verbatim} 
   \item Map collector, on associe 1 a chaque sommet puis on les cumul par somme lorsque
-le sommet apparait plusieurs fois.
+le sommet apparaît plusieurs fois.
 \begin{verbatim}
 toMap(s->s, s -> 1, Integer::sum)  // Map<Square,Integer>
 \end{verbatim}
@@ -96,7 +100,7 @@ en compte la somme.
 
 \section*{GogolS}
 Pour l'algo S on a juste a prendre la map d'adjacence et avancer tant qu'il
-reste des element dedant. en prenant soin d'enlever les noeuds qui n'ont plus
+reste des élément dedans. en prenant soin d'enlever les nœuds qui n'ont plus
 d'arcs sortant
 \begin{verbatim}
 int step=0;
@@ -118,9 +122,8 @@ do{
 Pour le second algo: 
 
 \begin{itemize}
-\item on calcul d'abords une arborescence quelconque (sous la forme d'une
-liste de rue).
-\begin{verbatim}
+ \item on calcul d'abords une arborescence quelconque (sous la forme d'une liste de rue).
+ \begin{verbatim}
     public Path arborescence(Square current, Path pathTaken) {
         if (pathTaken.size() == city.getSquares().count())
             return pathTaken;
@@ -136,8 +139,8 @@ liste de rue).
     }
 \end{verbatim}
 
-\item on numerote les rues grace a cette arborescence.
-\begin{verbatim}
+ \item on numérote les rues grâce a cette arborescence.
+ \begin{verbatim}
     public void numerotation(Path arbo) {
         List<Street> antiArbo = city.oposingArcs(arbo);
        
@@ -145,8 +148,6 @@ liste de rue).
             int degre = city.degreOfX().get(sq);
             list.sort((s1,s2)->{
                 int res = 0;
-                if(arbo.contains(s1)) res+=2;
-                if(arbo.contains(s2)) res-=2;
                 if(antiArbo.contains(s1)) res-=1;
                 if(antiArbo.contains(s2)) res+=1;
                 return res;
@@ -159,9 +160,8 @@ liste de rue).
     }
 \end{verbatim}
 
-\item On parcours en partant de current et en prenant le plus petit sommet.pos
-attribut
-\begin{verbatim}
+ \item On parcours en partant de current et en prenant le plus petit sommet.pos attribut
+ \begin{verbatim}
     Path usedStreet = new Path();
     for (int step=1; step<=city.getStreets().count()/2;step++) {
         Street next = adjM.get(current)
@@ -181,17 +181,52 @@ attribut
 
 
 \section*{GogolXL}
+Pour l'algo XL, le problème est qu'il n'est pas Eulerien et donc il est impossible de ne pas re-emprunter au moins une arete.
+
+Nous chercherons donc a la rendre Eulerien en suivant la méthode du postier chinois. en connectant les sommets de degrés impair par des arcs virtuel représentant le chemin le plus cours entre ces nœuds
+
+\begin{figure}[h!]
+  \centering
+  \subfloat[GogolXL raw input graph]{{\includegraphics[height=5cm]{./png/GogolXL.png} }}%
+  \qquad
+  \subfloat[GogolXL with virtual edges]{{\includegraphics[height=7cm]{./png/XLLL.png} }}%
+  \caption{Etat initial}%
+  \label{fig:example}%
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \subfloat[Step 0]{{\includegraphics[height=7cm]{./png/GogolL_XLL_step_0.png} }}%
+  \qquad
+  \subfloat[Step 1]{{\includegraphics[height=7cm]{./png/GogolL_XLL_step_1.png} }}%
+  
+  \subfloat[Step 2]{{\includegraphics[height=7cm]{./png/GogolL_XLL_step_2.png} }}%
+  \qquad
+  \subfloat[Step 3]{{\includegraphics[height=7cm]{./png/GogolL_XLL_step_3.png} }}%
+\end{figure}
+  
+\begin{figure}[h!]
+ \centering
+  \subfloat[Step 4]{{\includegraphics[height=7cm]{./png/GogolL_XLL_step_4.png} }}%
+  \qquad
+  \subfloat[Step 5]{{\includegraphics[height=7cm]{./png/GogolL_XLL_step_5.png} }}%
+  
+  \subfloat[Step 6]{{\includegraphics[height=7cm]{./png/GogolL_XLL_step_6.png} }}%
+  \qquad
+  \subfloat[Step 7]{{\includegraphics[height=7cm]{./png/GogolL_XLL_step_7.png} }}%
+
+  \subfloat[Step 8]{{\includegraphics[height=7cm]{./png/GogolL_XLL_step_8.png} }}%
+  \qquad
+  \subfloat[Step 9]{{\includegraphics[height=7cm]{./png/GogolL_XLL_step_9.png} }}%
+  
+  \caption{Execution}%
+  \label{fig:example}%
+\end{figure}
 
 
 \section*{Conclusion}
+Stream API nous permet d’écrire ce que nous voulons obtenir sans préciser comment on souhaite l'obtenir. ce qui permet a la VM de construire elle même l’exécution la plus adapte.
 
 
-
-\begin{thebibliography}{9}
-%\bibitem{Robotics} Fred G. Martin \emph{Robotics Explorations: A Hands-On
-% Introduction to Engineering}. New Jersey: Prentice Hall.
-%\bibitem{Flueck}  Flueck, Alexander J. 2005. \emph{ECE 100}[online]. Chicago:
-% Illinois Institute of Technology, Electrical and Computer Engineering Department, 2005 [cited 30 August 2005]. Available from World Wide Web: (http://www.ece.iit.edu/~flueck/ece100).
-\end{thebibliography}
 
 \end{document}

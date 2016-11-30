@@ -1,0 +1,53 @@
+17.
+33.
+Place du A.
+Place du B.
+Place du C.
+Place du D.
+Place du E.
+Place du F.
+Place du G.
+Place du H.
+Place du I.
+Place du J.
+Place du K.
+Place du L.
+Place du M.
+Place du N.
+Place du O.
+Place du P.
+Place du R.
+Rue AI;Place du A;Place du I.
+Rue AH;Place du A;Place du H.
+Rue AG;Place du A;Place du G.
+Rue BH;Place du B;Place du H.
+Rue BR;Place du B;Place du R.
+Rue BO;Place du B;Place du O.
+Rue CF;Place du C;Place du F.
+Rue CR;Place du C;Place du R.
+Rue CL;Place du C;Place du L.
+Rue DJ;Place du D;Place du J.
+Rue DL;Place du D;Place du L.
+Rue DM;Place du D;Place du M.
+Rue EF;Place du E;Place du F.
+Rue EH;Place du E;Place du H.
+Rue EK;Place du E;Place du K.
+Rue FG;Place du F;Place du G.
+Rue GH;Place du G;Place du H.
+Rue GI;Place du G;Place du I.
+Rue HI;Place du H;Place du I.
+Rue HJ;Place du H;Place du J.
+Rue IP;Place du I;Place du P.
+Rue JK;Place du J;Place du K.
+Rue JR;Place du J;Place du R.
+Rue KL;Place du K;Place du L.
+Rue KN;Place du K;Place du N.
+Rue LM;Place du L;Place du M.
+Rue MN;Place du M;Place du N.
+Rue MO;Place du M;Place du O.
+Rue NP;Place du N;Place du P.
+Rue NR;Place du N;Place du R.
+Rue DE;Place du D;Place du E.
+Rue FA;Place du F;Place du A.
+Rue CB;Place du C;Place du B.
+

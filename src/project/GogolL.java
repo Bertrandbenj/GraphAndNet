@@ -43,12 +43,13 @@ public class GogolL implements Car {
 		
 		
 		numerotation(arbo);
-		city.toDot(true, false, true, true, false, "GogolL_" + file + "_step_0" , current,arbo);
+		city.toDot(true, false, true, true, true, "GogolL_" + file + "_step_0" , current,arbo);
 
 		
 		Path usedStreet = new Path();
 		for (int step=1; step<=city.oriented().count()/2;step++) {
-
+			//System.out.println(adjM);
+			//System.out.println(adjM.size()+" "+adjM.get(current).stream().map(s-> s.name).collect(Collectors.joining()));
 			Street next = adjM.get(current)
 					.stream()
 					.filter(s -> !usedStreet.contains(s.name))
@@ -60,8 +61,9 @@ public class GogolL implements Car {
 			next.step = step;
 			current = next.sq2;
 
-			System.out.println("used street: " + usedStreet);
+			System.out.println(usedStreet);
 			city.toDot(true, false, true, true, false, "GogolL_" + file + "_step_" + step, current, usedStreet);
+			System.out.println();
 		}
 
 	}
@@ -74,13 +76,13 @@ public class GogolL implements Car {
 			
 			int degre = city.verticesDegree().get(sq);
 			
-			list.sort((s1,s2)->{
+			list.sort( (s1,s2) -> {
 				int res = 0;
-//				if(arbo.contains(s1)) res+=2;
-//				if(arbo.contains(s2)) res-=2;
 				if(antiArbo.contains(s1)) res-=1;
 				if(antiArbo.contains(s2)) res+=1;
-				System.out.println(s1.name +" : "+s2.name+" : "+res);
+				if(antiArbo.contains(city.reverseEdge(s1))) res+=2;
+				if(antiArbo.contains(city.reverseEdge(s2))) res-=2;
+				//System.out.println(s1.name +" : "+s2.name+" : "+res);
 				return res;
 			});
 	
@@ -88,12 +90,13 @@ public class GogolL implements Car {
 				t.pos=degre--;
 			}
 			
-			System.out.println(sq.name +"'s sorted list : "+list.stream().map(x->x.name+":"+x.pos).collect(Collectors.joining(" - "))+"\n");
+			//System.out.println(sq.name +"'s sorted list : "+list.stream().map(x->x.name+":"+x.pos).collect(Collectors.joining(" - "))+"\n");
 
 		});
 	}
 
 	public Path arborescence(Square current, Path pathTaken) {
+		//System.out.println("arbo "+current+pathTaken);
 		if (pathTaken.size() == city.getSquares().count())
 			return pathTaken;
 

@@ -8,12 +8,12 @@ import java.util.Arrays;
 public class Project {
 
 	public enum Algo {
-		GogolS, GogolL, GogolLRec, GogolXL
+		GogolS, GogolL, GogolXL
 	}
 
 	static Algo algoToUse = Algo.GogolS;
 	static String fileToUse = "nonsens.txt";
-	static boolean printDot = false;
+	public static boolean printDot = false;
 
 	public static void main(String[] args) throws InterruptedException {
 		// Parsing parameters
@@ -27,9 +27,6 @@ public class Project {
 					break;
 				case "-L":
 					algoToUse = Algo.GogolL;
-					break;
-				case "-LRec":
-					algoToUse = Algo.GogolLRec;
 					break;
 				case "-XL":
 					algoToUse = Algo.GogolXL;
@@ -57,14 +54,11 @@ public class Project {
 		case GogolL:
 			algorithm = new GogolL();
 			break;
-		case GogolLRec:
-			algorithm = new GogolLRec();
-			break;
 		case GogolXL:
 			algorithm = new GogolXL();
 			break;
 		default:
-			System.err.println("error please set -S -L -LRec -XL to choose an algorithm");
+			System.err.println("error please set -S -L -XL to choose an algorithm");
 		}
 
 		algorithm.driveThrough(c, c.startingNode(), fileToUse);
@@ -72,7 +66,7 @@ public class Project {
 	}
 
 	/**
-	 * fail safe command execution 
+	 * Fail safe command execution 
 	 * @param cmd
 	 * @return
 	 */

@@ -1,62 +1,61 @@
 package project;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Random;
 
-public class GogolS implements Car{
-	public GogolS(){
+public class GogolS implements Car {
+
+	City city;
+
+	public GogolS() {
+
+	}
+	
+	private Path recurse(AdjacencyLists adjM, Path path,	Square current, Integer position) {
+		//System.out.println("recursing " + adjM.size() + "  " + position + "  " + path.size() );
+		
+		// We remove the street that just visited from the AdjacencyLists 
+		//AdjacencyLists adjacencyLists= path.isEmpty()? adjM: adjM.driveIn(path.getLast());
+	
+		if (!adjM.isEmpty()) {			
+			List<Street> exitingStreet = new ArrayList<Street>( adjM.get(current));
+			for (Street st : exitingStreet) {
+				st.step = position;
+				path = recurse( adjM.driveIn(st), path.drive(st), st.sq2, position+1);
+				if (path.isFinished())
+					return path;
+			}
+			
+		}
+		return path;
 	}
 
 	/**
-	 * The main loop can't be parallelized easily
+	 * <pre>
+	 * (1) Choisir un sommet quelconque r dans le graphe et construire une
+	 * anti-arborescence dans G d’anti-racine r. Une anti-arborescence
+	 * d’anti-racine r est un sous-graphe qui devient une arborescence de racine
+	 * r une fois que tous ses arcs ont ́ete inverses.
 	 * 
-	 * Complexity = 
-	 *   Complexity of {@link City#adjacentStreet()}
-	 * + O(2*E)
+	 * (2) Pour chaque sommet x de G faire Num ́eroter de 1 ` a d + e sortant de
+	 * x) les arcs de G sortant de x, en mettant le plus grand numero G (x)
+	 * (degr ́ sur l’arc sortant appartenant ` a l’anti-arborescence (pour
+	 * l’anti-racine, la num ́erotation est quelconque).
+	 * 
+	 * (3) Partir de r, et tant qu’il existe un arc non encore utilise
+	 * permettant de quitter le sommet ou l’on se trouve, choisir celui de plus
+	 * petit numero et le parcourir.
 	 * 
 	 * <pre>
-	 * adjM = AdjacencyMap {@link City#adjacentStreet()}
-	 * current = startingPoint
-	 * do
-	 * 		path.add(current) 
-	 * 		adjL = adjM.get(current)
-	 * 		street = adjL.removeFirst
-	 * 		path.add(street)
-	 * 
-	 * 		if adjL is empty then
-	 * 			adjM.remove(adjL)
-	 * 		fi
-	 * 	
-	 * 		current = street.OtherSquare
-	 * while adjM not empty
-	 * </pre>
 	 */
 	@Override
-	public void driveThrough(City city, Square current, String file) {
-		System.out.println("Driving Through the city : \n");
-		
-		Map<Square, List<Street>> adjM = city.adjacentStreet();
-		//System.out.println("adj.size:"+adj.size() );
-		
-		Path path = new Path();
-		
-		int step=0;
-		do{
-			List<Street> adjL = adjM.get(current);
-			Street street = adjL.remove(0);
-			path.add(street);
-			
-			if(adjL.isEmpty()){
-				adjM.remove(current);
-			}
-			current=street.sq2;
-			
-			System.out.println("\tGoing to "+current.name +" by "+street.name);
-			 // used for printing out the graph
-			street.mark("step " + step++);
-		}while(!adjM.isEmpty());
-		//System.out.println(path.stream().map(s->s.mark+" "+s.name).collect(Collectors.joining("\n")) );
-		
-		city.toDot(false,true, true, true, true, "GogolS_"+file,null);
+	public void driveThrough(City c, Square current, String file) {
+		this.city = c;
+		System.out.println("Driving Through the city : \n\tStarting : " + current);
+		Path p = recurse( new AdjacencyLists(c), new Path(), current, 0);
+		System.out.println(p);
+		city.toDot(true, false, true, true, false, "GogolLRec_"+ p.size(), current, p);
 	}
+
 }

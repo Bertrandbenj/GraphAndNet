@@ -38,12 +38,12 @@ public class Parser {
 
 			while (nbStreets-- > 0) {
 				String[] str = removeDot(l.next()).split(";");
-
+				 //System.out.println("parsed "+str+" "+str[0]);
 				// we get the Matching Squares. simpler using streams
 				Square _1 = square.stream().filter(sq -> sq.equals(str[1])).findAny().get();
 				Square _2 = square.stream().filter(sq -> sq.equals(str[2])).findAny().get();
 				Street s = new Street(_1, _2, str[0]);
-				// System.out.println("parsed "+s);
+				
 				streets.add(s);
 			}
 			
