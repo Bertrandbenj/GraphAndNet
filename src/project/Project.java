@@ -72,7 +72,7 @@ public class Project {
 	 */
 	public static Object run(String cmd) {
 		try {
-
+			System.out.println("Executing : " + cmd);
 			Process process = new ProcessBuilder(new String[] { "bash", "-c", cmd }).start();
 	
 			ArrayList<String> output = new ArrayList<String>();

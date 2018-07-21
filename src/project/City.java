@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -44,26 +46,25 @@ public class City {
 	private Square[] squares;
 
 	public City(List<Street> sts, List<Square> sqs) {
-		
+
 		squares = sqs.toArray(new Square[sqs.size()]);
-		
+
 		streetsL = sts.toArray(new Street[sts.size()]);
-		
-		// we add the reverse edges in a separate array to distinguish 
-		streetsL2 = Stream.of(streetsL)
-						.map(st -> new Street(st.sq2, st.sq1, st.name))
-						.collect(Collectors.toList())
-						.toArray(new Street[streetsL.length]);
+
+		// we add the reverse edges in a separate array to distinguish
+		streetsL2 = Stream.of(streetsL).map(st -> new Street(st.sq2, st.sq1, st.name)).collect(Collectors.toList())
+				.toArray(new Street[streetsL.length]);
 
 		singleton = this;
 	}
-	
-	public Street reverseEdge(Street t){
-		
-		Street trev = new Street(t.sq2,t.sq1,t.name);
-		//System.out.println(t +" "+trev+"\n"+ Stream.of(streetsL).filter(st -> st.name.equals(t.name)).map(x->x.toString()).collect(Collectors.joining("\n")));
+
+	public Street reverseEdge(Street t) {
+
+		Street trev = new Street(t.sq2, t.sq1, t.name);
+		// System.out.println(t +" "+trev+"\n"+ Stream.of(streetsL).filter(st ->
+		// st.name.equals(t.name)).map(x->x.toString()).collect(Collectors.joining("\n")));
 		return Stream.of(streetsL2).filter(s -> s.equals(trev)).findFirst().orElse(null);
-		 
+
 	}
 
 	/**
@@ -72,22 +73,21 @@ public class City {
 	 * @return a mapping representing the incidence of each square
 	 */
 	public Map<Square, Integer> verticesDegree() {
-		return unOriented()
-				.flatMap(street -> Stream.of(street.sq1, street.sq2))
-				.collect(toMap(	s -> s, 
-								s -> 1, 
-								Integer::sum));
+		return unOriented().flatMap(street -> Stream.of(street.sq1, street.sq2))
+				.collect(toMap(s -> s, s -> 1, Integer::sum));
 	}
 
 	/**
-	 * aggregate marking of the two arcs into one street object. used for
-	 * display only
+	 * aggregate marking of the two arcs into one street object. used for display
+	 * only
 	 * 
 	 * @return a list of undirected streets
 	 */
 	public Stream<Street> unOriented() {
 		return Stream.of(streetsL);
 	}
+
+	BinaryOperator<List<Street>> huhu = (l1, l2) -> Stream.concat(l1.stream(), l2.stream()).collect(toList());
 
 	/**
 	 * Adjacency lists of street
@@ -115,12 +115,11 @@ public class City {
 	 * @return a key value map of Square -> List of Street
 	 */
 	Map<Square, List<Street>> adjacentStreet() {
-		return oriented()
-					.collect(toMap(	st -> st.sq1, 
-									st -> Stream.of(st).collect(toList()),
-									(list1, list2) -> Stream.concat(list1.stream(), list2.stream())
-									.collect(toList())
-							));
+		return oriented().collect(Collectors.toMap(//
+				Street::getSq1, //
+				st -> Stream.of(st).collect(toList()), //
+				huhu //
+		));
 	}
 
 	List<Street> oposingArcs(List<Street> l) {
@@ -129,8 +128,8 @@ public class City {
 
 	/**
 	 * <pre>
-	 * write Doc/fileOut.dot, a representation of the graph in dot format
-	 * execute "bash -c /usr/bin/dot -Tpng Doc/fileOut.dot -o Doc/fileOut.png"
+	 * write Doc/fileOut.dot, a representation of the graph in dot format execute
+	 * "bash -c /usr/bin/dot -Tpng Doc/fileOut.dot -o Doc/fileOut.png"
 	 * 
 	 * <pre>
 	 * 
@@ -144,8 +143,9 @@ public class City {
 	 */
 	String toDot(boolean allArcs, boolean printStreetName, boolean printSquareName, boolean printMark,
 			boolean printDoubleArrow, String fileOut, Square current, LinkedList<Street> path) {
-		if(!Project.printDot) return "";
-		
+		if (!Project.printDot)
+			return "";
+
 		String res = "digraph {\n";
 		if (printDoubleArrow && !allArcs)
 			res += "edge [dir=\"both\"];\n";
@@ -184,25 +184,24 @@ public class City {
 	}
 
 	/**
-	 * Choose a starting Node : any if it is Eulerien or an odd one if it is not 
-	 *  
+	 * Choose a starting Node : any if it is Eulerien or an odd one if it is not
+	 * 
 	 * @return the Starting Square
 	 */
 	public Square startingNode() {
-		Square res = isEulerien() ? getSquares().findAny().get() 
-						 		  : oddVertices().findAny().get();
-		System.out.println("Choosing starting node "+ res);
+		Square res = isEulerien() ? getSquares().findAny().get() : oddVertices().findAny().get();
+		System.out.println("Choosing starting node " + res);
 		return res;
 	}
 
 	/**
 	 * <pre>
-	 * Tell whether or not this graph admit an Eulerian path using the property
-	 * that says : "For the existence of Eulerian trails it is necessary that
-	 * zero or two vertices have an odd degree"
+	 * Tell whether or not this graph admit an Eulerian path using the property that
+	 * says : "For the existence of Eulerian trails it is necessary that zero or two
+	 * vertices have an odd degree"
 	 * 
-	 * @return true if and only if the Graph represented by this City object
-	 *         admit an Eulerian trail
+	 * @return true if and only if the Graph represented by this City object admit
+	 *         an Eulerian trail
 	 * 
 	 *         <pre>
 	 */
@@ -217,16 +216,13 @@ public class City {
 	 * @return A stream of all verticed having an odd number of edges
 	 */
 	public Stream<Square> oddVertices() {
-		return verticesDegree() 		
-				.entrySet()		// Set<Entry<Square,Integer>>
-				.stream()		// Stream<Entry<Square,Integer>>
-				// Filter the odd numbers only 
+		return verticesDegree().entrySet() // Set<Entry<Square,Integer>>
+				.stream() // Stream<Entry<Square,Integer>>
+				// Filter the odd numbers only
 				.filter(ent -> (ent.getValue().longValue() % 2) == 1)
-				// return only the Square  and forget the Integer
+				// return only the Square and forget the Integer
 				.map(ent -> ent.getKey());
 	}
-
-
 
 	public void sleep() {
 		try {
@@ -235,25 +231,20 @@ public class City {
 			e.printStackTrace();
 		}
 	}
-	
 
-	
-	public void setExtra(List<Path> list ){
-		System.out.println("\nAdding virtual streets to the city equivalent to the following path:\n"+ list +"\n");
-		
-		streetsL = Stream.concat(
-						Stream.of(streetsL),
-						list.stream()
-						.map(path -> new Street(path.tail(), path.head(), path.toString() ) ))
-					.collect(Collectors.toList()).toArray(new Street[list.size()+streetsL.length]);
+	public void setExtra(List<Path> list) {
+		System.out.println("\nAdding virtual streets to the city equivalent to the following path:\n" + list + "\n");
 
-		streetsL2 = Stream.concat(
-				Stream.of(streetsL2),
-				list.stream()
-				.map(path -> new Street(path.head(), path.tail(), path.toString() ) ))
-			.collect(Collectors.toList()).toArray(new Street[list.size()+streetsL2.length]);
+		streetsL = Stream
+				.concat(Stream.of(streetsL),
+						list.stream().map(path -> new Street(path.tail(), path.head(), path.toString())))
+				.collect(Collectors.toList()).toArray(new Street[list.size() + streetsL.length]);
 
-		
+		streetsL2 = Stream
+				.concat(Stream.of(streetsL2),
+						list.stream().map(path -> new Street(path.head(), path.tail(), path.toString())))
+				.collect(Collectors.toList()).toArray(new Street[list.size() + streetsL2.length]);
+
 	}
 
 	/**
@@ -262,11 +253,11 @@ public class City {
 	 * @return a collection of Street as a Stream
 	 */
 	public Stream<Street> oriented() {
-		
-		Stream<Street> res =Stream.concat(Stream.of(streetsL), Stream.of(streetsL2));
+
+		Stream<Street> res = Stream.concat(Stream.of(streetsL), Stream.of(streetsL2));
 //		if(extra!=null)
 //			return Stream.concat(res, Stream.of(extra));
-			
+
 		return res;
 	}
 
